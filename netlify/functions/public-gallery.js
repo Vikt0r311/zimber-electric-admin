@@ -1,7 +1,10 @@
-import { getStore } from "@netlify/blobs";
+const { getStore } = require("@netlify/blobs");
 
 // Public gallery data (for the main gallery page)
-export default async (req, context) => {
+exports.handler = async (event, context) => {
+  const req = {
+    method: event.httpMethod
+  };
   const method = req.method;
   
   // CORS headers
@@ -12,19 +15,31 @@ export default async (req, context) => {
   };
 
   if (method === "OPTIONS") {
-    return new Response(null, { status: 200, headers });
+    return {
+      statusCode: 200,
+      headers
+    };
   }
 
   if (method !== "GET") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...headers, "Content-Type": "application/json" }
-    });
+    return {
+      statusCode: 405,
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Method not allowed" })
+    };
   }
 
   try {
-    const metaStore = getStore("gallery-metadata");
-    const imagesStore = getStore("gallery-images");
+    const metaStore = getStore({
+      name: "gallery-metadata",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_TOKEN,
+    });
+    const imagesStore = getStore({
+      name: "gallery-images", 
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_TOKEN,
+    });
     
     // Get all folders
     const foldersData = await metaStore.get("folders", { type: "json" }) || {};
@@ -74,16 +89,18 @@ export default async (req, context) => {
       return new Date(bFolder.createdAt) - new Date(aFolder.createdAt);
     });
 
-    return new Response(JSON.stringify(folders), {
-      status: 200,
-      headers: { ...headers, "Content-Type": "application/json" }
-    });
+    return {
+      statusCode: 200,
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify(folders)
+    };
 
   } catch (error) {
     console.error("Public gallery error:", error);
-    return new Response(JSON.stringify({ error: "Failed to load gallery" }), {
-      status: 500,
-      headers: { ...headers, "Content-Type": "application/json" }
-    });
+    return {
+      statusCode: 500,
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Failed to load gallery" })
+    };
   }
 };

@@ -8,18 +8,11 @@ exports.handler = async (event, context) => {
   };
   const method = req.method;
   
-  // Try to get store with context - Netlify should auto-provide siteID and token
-  let metaStore;
-  try {
-    metaStore = getStore({
-      name: "gallery-metadata",
-      siteID: process.env.NETLIFY_SITE_ID || context.siteId,
-      token: process.env.NETLIFY_TOKEN || context.token,
-    });
-  } catch (error) {
-    console.error("Failed to initialize Netlify Blobs store:", error);
-    metaStore = getStore("gallery-metadata"); // Fallback
-  }
+  const metaStore = getStore({
+    name: "gallery-metadata",
+    siteID: process.env.NETLIFY_SITE_ID,
+    token: process.env.NETLIFY_TOKEN,
+  });
 
   // CORS headers
   const headers = {
@@ -39,7 +32,11 @@ exports.handler = async (event, context) => {
     if (method === "GET") {
       // Get all folders with metadata
       const foldersData = await metaStore.get("folders", { type: "json" }) || {};
-      const imagesStore = getStore("gallery-images");
+      const imagesStore = getStore({
+        name: "gallery-images",
+        siteID: process.env.NETLIFY_SITE_ID,
+        token: process.env.NETLIFY_TOKEN,
+      });
       
       // Count images for each folder
       const folders = await Promise.all(
