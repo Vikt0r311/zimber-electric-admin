@@ -3,7 +3,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  output: 'export', // Enable for Netlify deployment
+  // output: 'export', // Disabled for Netlify Functions support
   trailingSlash: true,
   images: {
     unoptimized: true
