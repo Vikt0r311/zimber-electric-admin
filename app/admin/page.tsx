@@ -141,14 +141,22 @@ export default function AdminPage() {
   const loadImages = async (folderId: string) => {
     try {
       const imagesEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/gallery-images?folder=${folderId}`
+        ? `/.netlify/functions/gallery-images-simple?folder=${folderId}`
         : `/api/admin/folders/${folderId}/images`
         
       const response = await fetch(imagesEndpoint)
       const data = await response.json()
-      setImages(data)
+      
+      // Ensure data is always an array
+      if (Array.isArray(data)) {
+        setImages(data)
+      } else {
+        console.error('Invalid images data format:', data)
+        setImages([])
+      }
     } catch (error) {
       console.error('Error loading images:', error)
+      setImages([])
     }
   }
 
