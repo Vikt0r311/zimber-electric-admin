@@ -39,7 +39,14 @@ export default function GalleryPage() {
   const loadCategories = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/gallery/folders')
+      
+      // In production (Netlify), use Netlify Functions directly
+      // In development, use Next.js API routes
+      const apiEndpoint = process.env.NODE_ENV === 'production' 
+        ? '/.netlify/functions/public-gallery'
+        : '/api/gallery/folders'
+        
+      const response = await fetch(apiEndpoint)
       const data = await response.json()
       
       // Add "All" category at the beginning
