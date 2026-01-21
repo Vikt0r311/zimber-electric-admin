@@ -61,7 +61,11 @@ export default function AdminPage() {
     try {
       const token = localStorage.getItem('admin-token')
       if (token) {
-        const response = await fetch('/api/admin/auth', {
+        const authEndpoint = process.env.NODE_ENV === 'production' 
+          ? '/.netlify/functions/admin-auth'
+          : '/api/admin/auth'
+          
+        const response = await fetch(authEndpoint, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -86,7 +90,11 @@ export default function AdminPage() {
     setLoginError('')
 
     try {
-      const response = await fetch('/api/admin/auth', {
+      const authEndpoint = process.env.NODE_ENV === 'production' 
+        ? '/.netlify/functions/admin-auth'
+        : '/api/admin/auth'
+        
+      const response = await fetch(authEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +118,11 @@ export default function AdminPage() {
 
   const loadFolders = async () => {
     try {
-      const response = await fetch('/api/admin/folders')
+      const foldersEndpoint = process.env.NODE_ENV === 'production' 
+        ? '/.netlify/functions/gallery-folders'
+        : '/api/admin/folders'
+        
+      const response = await fetch(foldersEndpoint)
       const data = await response.json()
       setFolders(data)
     } catch (error) {
@@ -120,7 +132,11 @@ export default function AdminPage() {
 
   const loadImages = async (folderId: string) => {
     try {
-      const response = await fetch(`/api/admin/folders/${folderId}/images`)
+      const imagesEndpoint = process.env.NODE_ENV === 'production' 
+        ? `/.netlify/functions/gallery-images?folder=${folderId}`
+        : `/api/admin/folders/${folderId}/images`
+        
+      const response = await fetch(imagesEndpoint)
       const data = await response.json()
       setImages(data)
     } catch (error) {
@@ -132,7 +148,11 @@ export default function AdminPage() {
     if (!newFolderName.trim() || !newFolderId.trim()) return
 
     try {
-      const response = await fetch('/api/admin/folders', {
+      const createFolderEndpoint = process.env.NODE_ENV === 'production' 
+        ? '/.netlify/functions/gallery-folder'
+        : '/api/admin/folders'
+        
+      const response = await fetch(createFolderEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +180,11 @@ export default function AdminPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/folders/${folderId}`, {
+      const deleteFolderEndpoint = process.env.NODE_ENV === 'production' 
+        ? `/.netlify/functions/gallery-folder?id=${folderId}`
+        : `/api/admin/folders/${folderId}`
+        
+      const response = await fetch(deleteFolderEndpoint, {
         method: 'DELETE',
       })
 
@@ -190,7 +214,11 @@ export default function AdminPage() {
     })
 
     try {
-      const response = await fetch(`/api/admin/folders/${selectedFolder}/upload`, {
+      const uploadEndpoint = process.env.NODE_ENV === 'production' 
+        ? `/.netlify/functions/upload-images?folder=${selectedFolder}`
+        : `/api/admin/folders/${selectedFolder}/upload`
+        
+      const response = await fetch(uploadEndpoint, {
         method: 'POST',
         body: formData,
       })
@@ -211,7 +239,11 @@ export default function AdminPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/folders/${selectedFolder}/images/${imageName}`, {
+      const deleteImageEndpoint = process.env.NODE_ENV === 'production' 
+        ? `/.netlify/functions/gallery-images?folder=${selectedFolder}&image=${imageName}`
+        : `/api/admin/folders/${selectedFolder}/images/${imageName}`
+        
+      const response = await fetch(deleteImageEndpoint, {
         method: 'DELETE',
       })
 
@@ -243,7 +275,11 @@ export default function AdminPage() {
     if (!editingFolder || !editFolderName.trim()) return
 
     try {
-      const response = await fetch(`/api/admin/folders/${editingFolder}`, {
+      const updateFolderEndpoint = process.env.NODE_ENV === 'production' 
+        ? `/.netlify/functions/gallery-folder?id=${editingFolder}`
+        : `/api/admin/folders/${editingFolder}`
+        
+      const response = await fetch(updateFolderEndpoint, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
