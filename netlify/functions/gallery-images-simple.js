@@ -18,9 +18,8 @@ exports.handler = async (event, context) => {
 
   try {
     if (method === "GET") {
-      // Parse folder ID from query params
-      const url = new URL(event.rawUrl || `https://example.com${event.path}?${event.rawQuery || ''}`);
-      const folderId = url.searchParams.get('folder');
+      // Parse folder ID from query params - use event.queryStringParameters
+      const folderId = event.queryStringParameters?.folder;
       
       if (!folderId) {
         return {
