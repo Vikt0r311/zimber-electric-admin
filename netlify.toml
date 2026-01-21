@@ -1,0 +1,53 @@
+[build]
+  command = "npm run build"
+  functions = "netlify/functions"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Function redirects for admin API
+[[redirects]]
+  from = "/api/admin/auth"
+  to = "/.netlify/functions/admin-auth"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin/folders"
+  to = "/.netlify/functions/gallery-folders"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin/folders/:folderId"
+  to = "/.netlify/functions/gallery-folder"
+  status = 200
+  force = true
+  headers = {X-Folder-ID = ":folderId"}
+
+[[redirects]]
+  from = "/api/admin/folders/:folderId/images"
+  to = "/.netlify/functions/gallery-images"
+  status = 200
+  force = true
+  headers = {X-Folder-ID = ":folderId"}
+
+[[redirects]]
+  from = "/api/admin/folders/:folderId/upload"
+  to = "/.netlify/functions/upload-images"
+  status = 200
+  force = true
+  headers = {X-Folder-ID = ":folderId"}
+
+# Public gallery API
+[[redirects]]
+  from = "/api/gallery/folders"
+  to = "/.netlify/functions/public-gallery"
+  status = 200
+
+# SPA fallback for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

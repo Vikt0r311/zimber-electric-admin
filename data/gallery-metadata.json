@@ -1,0 +1,27 @@
+{
+  "tata-140m2-csaladi-haz": {
+    "id": "tata-140m2-csaladi-haz",
+    "name": "Tata - 140m² Családi Ház",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  "almasfuzito_55m2_panellakas": {
+    "id": "almasfuzito_55m2_panellakas",
+    "name": "Almasfüzitő - 55m² Panellakás",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  "komarom-64m2-panellakas": {
+    "id": "komarom-64m2-panellakas",
+    "name": "Komárom - 64m² Panellakás",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  "homlokzati-hoszigeteleshez-szerelvenyek": {
+    "id": "homlokzati-hoszigeteleshez-szerelvenyek",
+    "name": "Homlokzati Hőszigetelés",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  "kiseloszto-csere": {
+    "id": "kiseloszto-csere",
+    "name": "Kiselosztó Csere",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+}
