@@ -1,4 +1,6 @@
 // Simple test function for troubleshooting
+let mockFolders = []; // In-memory storage for testing
+
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
   
@@ -18,20 +20,40 @@ exports.handler = async (event, context) => {
 
   try {
     if (method === "GET") {
-      // Return empty array for now
+      // Return mock folders
       return {
         statusCode: 200,
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify([])
+        body: JSON.stringify(mockFolders)
       };
     }
 
     if (method === "POST") {
-      // Mock success response
+      // Create mock folder
+      const { name, folder } = JSON.parse(event.body || '{}');
+      
+      if (!name || !folder) {
+        return {
+          statusCode: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Name and folder ID are required" })
+        };
+      }
+
+      const newFolder = {
+        id: folder,
+        name: name.trim(),
+        folder: folder,
+        imageCount: 0,
+        createdAt: new Date().toISOString()
+      };
+      
+      mockFolders.push(newFolder);
+
       return {
         statusCode: 200,
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ success: true, message: "Mock folder created" })
+        body: JSON.stringify({ success: true, message: "Mock folder created", folder: newFolder })
       };
     }
 
