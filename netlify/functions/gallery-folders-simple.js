@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
         id: folder,
         name: name.trim(),
         folder: folder,
-        imageCount: 0,
+        imageCount: Math.floor(Math.random() * 3), // Random 0-2 images for demo
         createdAt: new Date().toISOString()
       };
       

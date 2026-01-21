@@ -1,4 +1,6 @@
 // Simple upload images function for troubleshooting
+let mockImages = {}; // Store mock images per folder (shared with gallery-images-simple)
+
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
   
@@ -36,8 +38,22 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // For now, just return success response (mock upload)
-    // In real implementation, this would process the multipart form data
+    // Initialize mock images array for this folder if it doesn't exist
+    if (!mockImages[folderId]) {
+      mockImages[folderId] = [];
+    }
+
+    // Create mock uploaded image
+    const mockImage = {
+      name: `mock-image-${Date.now()}.jpg`,
+      path: `https://via.placeholder.com/300x200/1a1d29/00d9ff?text=Mock+Image+${mockImages[folderId].length + 1}`,
+      size: 123456,
+      type: "image/jpeg"
+    };
+
+    // Add to mock storage
+    mockImages[folderId].push(mockImage);
+
     return {
       statusCode: 200,
       headers: { ...headers, "Content-Type": "application/json" },
@@ -45,14 +61,7 @@ exports.handler = async (event, context) => {
         success: true, 
         message: "Mock upload successful",
         uploaded: 1,
-        images: [
-          {
-            key: `${folderId}/mock-image.jpg`,
-            name: "mock-image.jpg",
-            size: 123456,
-            type: "image/jpeg"
-          }
-        ]
+        images: [mockImage]
       })
     };
 
