@@ -231,7 +231,7 @@ export default function AdminPage() {
 
     try {
       const uploadEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/upload-images?folder=${selectedFolder}`
+        ? `/.netlify/functions/upload-images-simple?folder=${selectedFolder}`
         : `/api/admin/folders/${selectedFolder}/upload`
         
       const response = await fetch(uploadEndpoint, {
