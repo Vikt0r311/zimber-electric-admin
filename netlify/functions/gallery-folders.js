@@ -1,7 +1,11 @@
-import { getStore } from "@netlify/blobs";
+const { getStore } = require("@netlify/blobs");
 
 // Gallery folders (mappa metaadatok kezelése)
-export default async (req, context) => {
+exports.handler = async (event, context) => {
+  const req = {
+    method: event.httpMethod,
+    json: () => JSON.parse(event.body || '{}')
+  };
   const method = req.method;
   const metaStore = getStore("gallery-metadata");
 
@@ -13,7 +17,10 @@ export default async (req, context) => {
   };
 
   if (method === "OPTIONS") {
-    return new Response(null, { status: 200, headers });
+    return {
+      statusCode: 200,
+      headers
+    };
   }
 
   try {
@@ -33,10 +40,11 @@ export default async (req, context) => {
         })
       );
 
-      return new Response(JSON.stringify(folders), {
-        status: 200,
-        headers: { ...headers, "Content-Type": "application/json" }
-      });
+      return {
+        statusCode: 200,
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify(folders)
+      };
     }
 
     if (method === "POST") {
@@ -44,19 +52,21 @@ export default async (req, context) => {
       const { name, folder: folderId } = await req.json();
       
       if (!name || !folderId) {
-        return new Response(JSON.stringify({ error: "Name and folder ID are required" }), {
-          status: 400,
-          headers: { ...headers, "Content-Type": "application/json" }
-        });
+        return {
+          statusCode: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Name and folder ID are required" })
+        };
       }
 
       const foldersData = await metaStore.get("folders", { type: "json" }) || {};
       
       if (foldersData[folderId]) {
-        return new Response(JSON.stringify({ error: "Folder already exists" }), {
-          status: 400,
-          headers: { ...headers, "Content-Type": "application/json" }
-        });
+        return {
+          statusCode: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Folder already exists" })
+        };
       }
 
       foldersData[folderId] = {
@@ -68,22 +78,25 @@ export default async (req, context) => {
 
       await metaStore.set("folders", foldersData);
 
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { ...headers, "Content-Type": "application/json" }
-      });
+      return {
+        statusCode: 200,
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ success: true })
+      };
     }
 
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...headers, "Content-Type": "application/json" }
-    });
+    return {
+      statusCode: 405,
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Method not allowed" })
+    };
 
   } catch (error) {
     console.error("Gallery folders error:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { ...headers, "Content-Type": "application/json" }
-    });
+    return {
+      statusCode: 500,
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Internal server error" })
+    };
   }
 };
