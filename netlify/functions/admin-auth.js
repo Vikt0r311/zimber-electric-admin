@@ -6,7 +6,7 @@ exports.handler = async (event, context) => {
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type"
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
   };
 
   if (method === "OPTIONS") {
@@ -23,14 +23,18 @@ exports.handler = async (event, context) => {
       const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "ZimberAdmin2026";
       console.log('Environment ADMIN_PASSWORD:', process.env.ADMIN_PASSWORD);
       console.log('Using password:', ADMIN_PASSWORD);
+      console.log('Received password:', password);
+      console.log('Passwords match:', password === ADMIN_PASSWORD);
       
       if (password === ADMIN_PASSWORD) {
+        console.log('Authentication successful');
         return {
           statusCode: 200,
           headers: { ...headers, "Content-Type": "application/json" },
           body: JSON.stringify({ success: true, token: "admin-authenticated" })
         };
       } else {
+        console.log('Authentication failed - password mismatch');
         return {
           statusCode: 401,
           headers: { ...headers, "Content-Type": "application/json" },
