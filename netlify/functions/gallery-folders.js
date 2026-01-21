@@ -7,7 +7,19 @@ exports.handler = async (event, context) => {
     json: () => JSON.parse(event.body || '{}')
   };
   const method = req.method;
-  const metaStore = getStore("gallery-metadata");
+  
+  // Try to get store with context - Netlify should auto-provide siteID and token
+  let metaStore;
+  try {
+    metaStore = getStore({
+      name: "gallery-metadata",
+      siteID: process.env.NETLIFY_SITE_ID || context.siteId,
+      token: process.env.NETLIFY_TOKEN || context.token,
+    });
+  } catch (error) {
+    console.error("Failed to initialize Netlify Blobs store:", error);
+    metaStore = getStore("gallery-metadata"); // Fallback
+  }
 
   // CORS headers
   const headers = {
