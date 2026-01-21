@@ -2,17 +2,31 @@ const { getStore } = require("@netlify/blobs");
 
 // Gallery folders (mappa metaadatok kezelése)
 exports.handler = async (event, context) => {
-  const req = {
-    method: event.httpMethod,
-    json: () => JSON.parse(event.body || '{}')
-  };
-  const method = req.method;
+  const method = event.httpMethod;
   
-  const metaStore = getStore({
-    name: "gallery-metadata",
-    siteID: process.env.NETLIFY_SITE_ID,
-    token: process.env.NETLIFY_TOKEN,
-  });
+  let metaStore, imagesStore;
+  try {
+    metaStore = getStore({
+      name: "gallery-metadata",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_TOKEN,
+    });
+    imagesStore = getStore({
+      name: "gallery-images",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_TOKEN,
+    });
+  } catch (error) {
+    console.error('Error initializing stores:', error);
+    return {
+      statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ error: "Store initialization failed" })
+    };
+  }
 
   // CORS headers
   const headers = {
@@ -32,11 +46,6 @@ exports.handler = async (event, context) => {
     if (method === "GET") {
       // Get all folders with metadata
       const foldersData = await metaStore.get("folders", { type: "json" }) || {};
-      const imagesStore = getStore({
-        name: "gallery-images",
-        siteID: process.env.NETLIFY_SITE_ID,
-        token: process.env.NETLIFY_TOKEN,
-      });
       
       // Count images for each folder
       const folders = await Promise.all(
@@ -58,7 +67,7 @@ exports.handler = async (event, context) => {
 
     if (method === "POST") {
       // Create new folder
-      const { name, folder: folderId } = await req.json();
+      const { name, folder: folderId } = JSON.parse(event.body || '{}');
       
       if (!name || !folderId) {
         return {
