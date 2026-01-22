@@ -30,7 +30,7 @@ exports.handler = async (event, context) => {
 
       // Generate static images for real folders
       const staticImageMaps = {
-        'tata-140m2-csaladi-haz': generateImageList('tata-140m2-csaladi-haz', 59),
+        'tata-140m2-csaladi-haz': generateImageList('tata-140m2-csaladi-haz', 58),
         'komarom-64m2-panellakas': generateImageList('komarom-64m2-panellakas', 16),
         'almasfuzito-55m2-panellakas': generateImageList('almasfuzito_55m2_panellakas', 26),
         'kiseloszto-csere': generateImageList('kiseloszto-csere', 2),

@@ -4,7 +4,7 @@ let mockFolders = [
     id: "tata-140m2-csaladi-haz",
     name: "Tata - 140m² Családi Ház", 
     folder: "tata-140m2-csaladi-haz",
-    imageCount: 59
+    imageCount: 58
   },
   {
     id: "komarom-64m2-panellakas",
