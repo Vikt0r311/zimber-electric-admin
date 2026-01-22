@@ -65,6 +65,17 @@ exports.handler = async (event, context) => {
       console.log('Gallery folder contents:', galleryContents.map(f => f.name));
     }
 
+    // Check gallery/10 folder specifically
+    const { data: gallery10Contents, error: gallery10Error } = await supabase.storage
+      .from('images')
+      .list('gallery/10', { limit: 100 });
+
+    if (gallery10Error) {
+      console.error('Gallery/10 list error:', gallery10Error);
+    } else {
+      console.log('Gallery/10 folder contents:', gallery10Contents.map(f => ({ name: f.name, size: f.metadata?.size })));
+    }
+
     return {
       statusCode: 200,
       headers: { ...headers, "Content-Type": "application/json" },
@@ -72,7 +83,12 @@ exports.handler = async (event, context) => {
         success: true,
         buckets: buckets.map(b => b.name),
         rootContents: imagesInRoot ? imagesInRoot.map(f => f.name) : [],
-        galleryContents: galleryContents ? galleryContents.map(f => f.name) : []
+        galleryContents: galleryContents ? galleryContents.map(f => f.name) : [],
+        gallery10Contents: gallery10Contents ? gallery10Contents.map(f => ({ 
+          name: f.name, 
+          size: f.metadata?.size,
+          updated: f.updated_at 
+        })) : []
       })
     };
 
