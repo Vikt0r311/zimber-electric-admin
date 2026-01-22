@@ -20,7 +20,7 @@ export default function ContactPage() {
     formData.append('form-name', 'kapcsolat')
 
     try {
-      const response = await fetch('/', {
+      const response = await fetch('/kapcsolat-form.html', {
         method: 'POST',
         body: formData,
       })
@@ -85,6 +85,7 @@ export default function ContactPage() {
                     method="POST"
                     data-netlify="true"
                     data-netlify-honeypot="bot-field"
+                    action="/kapcsolat-form.html"
                     onSubmit={handleSubmit}
                     className="space-y-6"
                   >
