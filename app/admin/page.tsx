@@ -119,7 +119,7 @@ export default function AdminPage() {
   const loadFolders = async () => {
     try {
       const foldersEndpoint = process.env.NODE_ENV === 'production' 
-        ? '/.netlify/functions/gallery-folders'
+        ? '/.netlify/functions/gallery-folders-simple'
         : '/api/admin/folders'
         
       const response = await fetch(foldersEndpoint)
@@ -165,7 +165,7 @@ export default function AdminPage() {
 
     try {
       const createFolderEndpoint = process.env.NODE_ENV === 'production' 
-        ? '/.netlify/functions/gallery-folders'
+        ? '/.netlify/functions/gallery-folders-simple'
         : '/api/admin/folders'
         
       const response = await fetch(createFolderEndpoint, {
