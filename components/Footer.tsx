@@ -59,8 +59,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2 text-white/70">
                 <Mail size={16} className="text-volt-gold flex-shrink-0" />
-                <a href="mailto:zimber.electric@gmail.com" className="hover:text-electric-cyan transition break-all">
-                  zimber.electric@gmail.com
+                <a href="mailto:info@zimber-electric.hu" className="hover:text-electric-cyan transition break-all">
+                  info@zimber-electric.hu
                 </a>
               </li>
               <li className="flex items-center gap-2 text-white/70">

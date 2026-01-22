@@ -5,7 +5,7 @@ export default function StructuredData() {
     name: 'Zimber Electric',
     description: 'Professzionális villanyszerelő szolgáltatás Komárom-Esztergom vármegyében',
     telephone: '+36307093948',
-    email: 'zimber.electric@gmail.com',
+    email: 'info@zimber-electric.hu',
     areaServed: [
       'Tatabánya',
       'Komárom',

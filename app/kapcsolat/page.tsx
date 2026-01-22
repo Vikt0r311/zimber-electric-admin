@@ -213,10 +213,10 @@ export default function ContactPage() {
                     <Mail className="text-volt-gold mb-3" size={32} />
                     <h3 className="text-white font-bold text-lg mb-2">Írj emailt</h3>
                     <a
-                      href="mailto:zimber.electric@gmail.com"
+                      href="mailto:info@zimber-electric.hu"
                       className="text-electric-cyan hover:underline break-all"
                     >
-                      zimber.electric@gmail.com
+                      info@zimber-electric.hu
                     </a>
                   </div>
 
