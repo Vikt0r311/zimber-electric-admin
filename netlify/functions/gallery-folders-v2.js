@@ -96,6 +96,36 @@ exports.handler = async (event, context) => {
       };
     }
 
+    if (method === "DELETE") {
+      // Delete folder
+      const folderId = event.queryStringParameters?.id;
+      
+      if (!folderId) {
+        return {
+          statusCode: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Folder ID is required" })
+        };
+      }
+
+      const folderIndex = mockFolders.findIndex(f => f.id === folderId);
+      if (folderIndex === -1) {
+        return {
+          statusCode: 404,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Folder not found" })
+        };
+      }
+
+      mockFolders.splice(folderIndex, 1);
+
+      return {
+        statusCode: 200,
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ success: true, message: "Folder deleted successfully" })
+      };
+    }
+
     return {
       statusCode: 405,
       headers: { ...headers, "Content-Type": "application/json" },

@@ -197,7 +197,7 @@ export default function AdminPage() {
 
     try {
       const deleteFolderEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/gallery-folder?id=${folderId}`
+        ? `/.netlify/functions/gallery-folders-v2?id=${folderId}`
         : `/api/admin/folders/${folderId}`
         
       const response = await fetch(deleteFolderEndpoint, {
