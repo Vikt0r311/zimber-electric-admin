@@ -45,6 +45,7 @@ exports.handler = async (event, context) => {
     // Get uploaded images from Supabase Storage
     let uploadedImages = [];
     try {
+      console.log(`Looking for uploaded images in: gallery/${folderId}`);
       const { data, error } = await supabase.storage
         .from('images')
         .list(`gallery/${folderId}`);
@@ -52,20 +53,25 @@ exports.handler = async (event, context) => {
       if (error) {
         console.error('Supabase list error:', error);
       } else if (data) {
-        uploadedImages = data.map(file => {
-          const { data: { publicUrl } } = supabase.storage
-            .from('images')
-            .getPublicUrl(`gallery/${folderId}/${file.name}`);
+        console.log(`Found ${data.length} uploaded images in Supabase`);
+        uploadedImages = data
+          .filter(file => file.name !== '.emptyFolderPlaceholder') // Filter out placeholder files
+          .map(file => {
+            const { data: { publicUrl } } = supabase.storage
+              .from('images')
+              .getPublicUrl(`gallery/${folderId}/${file.name}`);
 
-          return {
-            name: file.name,
-            path: publicUrl,
-            key: `gallery/${folderId}/${file.name}`,
-            uploaded: true,
-            size: file.metadata?.size || 0,
-            updated_at: file.updated_at
-          };
-        });
+            console.log(`Mapped uploaded image: ${file.name} -> ${publicUrl}`);
+            return {
+              name: file.name,
+              path: publicUrl,
+              src: publicUrl, // Add src for compatibility
+              key: `gallery/${folderId}/${file.name}`,
+              uploaded: true,
+              size: file.metadata?.size || 0,
+              updated_at: file.updated_at
+            };
+          });
       }
     } catch (error) {
       console.error('Error fetching uploaded images:', error);
