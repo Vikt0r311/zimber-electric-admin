@@ -165,7 +165,7 @@ export default function AdminPage() {
 
     try {
       const createFolderEndpoint = process.env.NODE_ENV === 'production' 
-        ? '/.netlify/functions/gallery-folders-real'
+        ? '/.netlify/functions/gallery-folders-v2'
         : '/api/admin/folders'
         
       const response = await fetch(createFolderEndpoint, {

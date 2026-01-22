@@ -60,7 +60,7 @@ exports.handler = async (event, context) => {
     }
 
     if (method === "POST") {
-      // Create mock folder
+      // Create new folder
       const { name, folder } = JSON.parse(event.body || '{}');
       
       if (!name || !folder) {
@@ -71,20 +71,28 @@ exports.handler = async (event, context) => {
         };
       }
 
+      // Check if folder already exists
+      if (mockFolders.find(f => f.id === folder)) {
+        return {
+          statusCode: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Folder already exists" })
+        };
+      }
+
       const newFolder = {
         id: folder,
         name: name.trim(),
         folder: folder,
-        imageCount: Math.floor(Math.random() * 3), // Random 0-2 images for demo
-        createdAt: new Date().toISOString()
+        imageCount: 0
       };
       
       mockFolders.push(newFolder);
 
       return {
-        statusCode: 200,
+        statusCode: 201,
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ success: true, message: "Mock folder created", folder: newFolder })
+        body: JSON.stringify({ success: true, message: "Folder created successfully", folder: newFolder })
       };
     }
 
