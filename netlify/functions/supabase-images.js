@@ -57,16 +57,20 @@ exports.handler = async (event, context) => {
         uploadedImages = data
           .filter(file => file.name !== '.emptyFolderPlaceholder') // Filter out placeholder files
           .map(file => {
+            const filePath = `gallery/${folderId}/${file.name}`;
             const { data: { publicUrl } } = supabase.storage
               .from('images')
-              .getPublicUrl(`gallery/${folderId}/${file.name}`);
+              .getPublicUrl(filePath);
 
             console.log(`Mapped uploaded image: ${file.name} -> ${publicUrl}`);
+            console.log(`Full file path: ${filePath}`);
+            
             return {
               name: file.name,
               path: publicUrl,
               src: publicUrl, // Add src for compatibility
-              key: `gallery/${folderId}/${file.name}`,
+              alt: `${folderId} - ${file.name}`, // Add alt text
+              key: filePath,
               uploaded: true,
               size: file.metadata?.size || 0,
               updated_at: file.updated_at

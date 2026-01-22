@@ -70,10 +70,25 @@ exports.handler = async (event, context) => {
       .from('images')
       .list('gallery/10', { limit: 100 });
 
+    let imageUrls = [];
     if (gallery10Error) {
       console.error('Gallery/10 list error:', gallery10Error);
     } else {
       console.log('Gallery/10 folder contents:', gallery10Contents.map(f => ({ name: f.name, size: f.metadata?.size })));
+      
+      // Generate URLs for each image
+      imageUrls = gallery10Contents.map(file => {
+        const { data: { publicUrl } } = supabase.storage
+          .from('images')
+          .getPublicUrl(`gallery/10/${file.name}`);
+        return {
+          name: file.name,
+          url: publicUrl,
+          size: file.metadata?.size
+        };
+      });
+      
+      console.log('Generated URLs:', imageUrls);
     }
 
     return {
@@ -88,7 +103,8 @@ exports.handler = async (event, context) => {
           name: f.name, 
           size: f.metadata?.size,
           updated: f.updated_at 
-        })) : []
+        })) : [],
+        imageUrls: imageUrls
       })
     };
 
