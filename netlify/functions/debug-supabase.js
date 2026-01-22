@@ -91,6 +91,32 @@ exports.handler = async (event, context) => {
       console.log('Generated URLs:', imageUrls);
     }
 
+    // Check gallery/kaka folder specifically
+    const { data: galleryKakaContents, error: galleryKakaError } = await supabase.storage
+      .from('images')
+      .list('gallery/kaka', { limit: 100 });
+
+    let kakaImageUrls = [];
+    if (galleryKakaError) {
+      console.error('Gallery/kaka list error:', galleryKakaError);
+    } else {
+      console.log('Gallery/kaka folder contents:', galleryKakaContents.map(f => ({ name: f.name, size: f.metadata?.size })));
+      
+      // Generate URLs for each image
+      kakaImageUrls = galleryKakaContents.map(file => {
+        const { data: { publicUrl } } = supabase.storage
+          .from('images')
+          .getPublicUrl(`gallery/kaka/${file.name}`);
+        return {
+          name: file.name,
+          url: publicUrl,
+          size: file.metadata?.size
+        };
+      });
+      
+      console.log('Generated kaka URLs:', kakaImageUrls);
+    }
+
     return {
       statusCode: 200,
       headers: { ...headers, "Content-Type": "application/json" },
@@ -104,7 +130,8 @@ exports.handler = async (event, context) => {
           size: f.metadata?.size,
           updated: f.updated_at 
         })) : [],
-        imageUrls: imageUrls
+        imageUrls: imageUrls,
+        kakaImageUrls: kakaImageUrls
       })
     };
 
