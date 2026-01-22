@@ -25,21 +25,21 @@ exports.handler = async (event, context) => {
           name: "Tata - 140m² Családi Ház", 
           folder: "tata-140m2-csaladi-haz",
           imageCount: 59,
-          images: generateStaticImages("tata-140m2-csaladi-haz", 10) // Show first 10
+          images: generateStaticImages("tata-140m2-csaladi-haz", 59)
         },
         {
           id: "komarom-64m2-panellakas",
           name: "Komárom - 64m² Panellakás",
           folder: "komarom-64m2-panellakas", 
           imageCount: 16,
-          images: generateStaticImages("komarom-64m2-panellakas", 10)
+          images: generateStaticImages("komarom-64m2-panellakas", 16)
         },
         {
           id: "almasfuzito-55m2-panellakas",
           name: "Almásfüzitő - 55m² Panellakás",
           folder: "almasfuzito_55m2_panellakas",
           imageCount: 26,
-          images: generateStaticImages("almasfuzito_55m2_panellakas", 10)
+          images: generateStaticImages("almasfuzito_55m2_panellakas", 26)
         },
         {
           id: "kiseloszto-csere",
