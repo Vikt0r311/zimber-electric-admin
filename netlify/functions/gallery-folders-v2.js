@@ -1,4 +1,4 @@
-// Real gallery folders function - updated $(date)
+// Gallery folders function v2 - restored Tata folder images
 let mockFolders = [
   {
     id: "tata-140m2-csaladi-haz",
