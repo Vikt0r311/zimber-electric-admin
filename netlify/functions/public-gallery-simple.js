@@ -1,4 +1,4 @@
-// Simple public gallery function for troubleshooting
+// Simple public gallery function with real static data
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
   
