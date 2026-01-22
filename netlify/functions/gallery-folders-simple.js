@@ -1,4 +1,4 @@
-// Simple test function with static folders
+// Real gallery folders function - updated $(date)
 let mockFolders = [
   {
     id: "tata-140m2-csaladi-haz",

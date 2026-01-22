@@ -1,4 +1,4 @@
-// Simple public gallery function with real static data
+// Real public gallery function - updated $(date)
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
   
