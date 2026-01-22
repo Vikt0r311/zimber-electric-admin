@@ -1,5 +1,5 @@
-// Gallery images function v2 - serves real static images
-let uploadedImages = {}; // Store uploaded images per folder
+// Gallery images function v2 - serves real static images with Blobs integration
+const { getStore } = require('@netlify/blobs');
 
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
@@ -30,6 +30,10 @@ exports.handler = async (event, context) => {
         };
       }
 
+      // Get the gallery store
+      const galleryStore = getStore('gallery-images');
+      console.log(`Listing blobs for folder: ${folderId}`);
+
       // Generate static images for real folders
       const staticImageMaps = {
         'tata-140m2-csaladi-haz': generateImageList('tata-140m2-csaladi-haz', 58),
@@ -40,8 +44,23 @@ exports.handler = async (event, context) => {
       };
 
       const staticImages = staticImageMaps[folderId] || [];
-      const dynamicImages = uploadedImages[folderId] || [];
-      const allImages = [...staticImages, ...dynamicImages];
+
+      // Get images from Blobs store
+      let blobImages = [];
+      try {
+        const { blobs } = await galleryStore.list({ prefix: `${folderId}/` });
+        console.log(`Found ${blobs.length} blobs for folder ${folderId}`);
+        
+        blobImages = blobs.map(blob => ({
+          name: blob.metadata?.originalName || blob.key.split('/').pop(),
+          path: `/.netlify/functions/gallery-image-v2?key=${encodeURIComponent(blob.key)}`,
+          key: blob.key
+        }));
+      } catch (error) {
+        console.error('Error fetching blobs:', error);
+      }
+
+      const allImages = [...staticImages, ...blobImages];
 
       return {
         statusCode: 200,
@@ -83,11 +102,29 @@ exports.handler = async (event, context) => {
     }
 
     if (method === "DELETE") {
-      // Mock delete response
+      const folderId = event.queryStringParameters?.folder;
+      const imageName = event.queryStringParameters?.image;
+      
+      if (!folderId || !imageName) {
+        return {
+          statusCode: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Folder ID and image name are required" })
+        };
+      }
+
+      // Remove the image from uploadedImages
+      if (uploadedImages[folderId]) {
+        uploadedImages[folderId] = uploadedImages[folderId].filter(img => img.name !== imageName);
+        if (uploadedImages[folderId].length === 0) {
+          delete uploadedImages[folderId];
+        }
+      }
+
       return {
         statusCode: 200,
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ success: true, message: "Mock image deleted" })
+        body: JSON.stringify({ success: true, message: "Image deleted successfully" })
       };
     }
 

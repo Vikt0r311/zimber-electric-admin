@@ -89,6 +89,21 @@ exports.handler = async (event, context) => {
       
       mockFolders.push(newFolder);
 
+      // Notify public-gallery-v2 about the new folder
+      try {
+        await fetch(`${event.headers.origin || 'https://zimber-electric.hu'}/.netlify/functions/public-gallery-v2`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'add_folder', 
+            folder: newFolder 
+          })
+        });
+        console.log('Successfully notified public gallery about new folder');
+      } catch (notifyError) {
+        console.log('Failed to notify public gallery about new folder:', notifyError);
+      }
+
       return {
         statusCode: 201,
         headers: { ...headers, "Content-Type": "application/json" },
@@ -117,7 +132,23 @@ exports.handler = async (event, context) => {
         };
       }
 
+      const deletedFolder = mockFolders[folderIndex];
       mockFolders.splice(folderIndex, 1);
+
+      // Notify public-gallery-v2 about the deleted folder
+      try {
+        await fetch(`${event.headers.origin || 'https://zimber-electric.hu'}/.netlify/functions/public-gallery-v2`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'remove_folder', 
+            folderId: deletedFolder.id 
+          })
+        });
+        console.log('Successfully notified public gallery about deleted folder');
+      } catch (notifyError) {
+        console.log('Failed to notify public gallery about deleted folder:', notifyError);
+      }
 
       return {
         statusCode: 200,

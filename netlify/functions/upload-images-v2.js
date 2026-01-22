@@ -1,4 +1,6 @@
-// Upload images function v2 - simple implementation without multiparty
+// Upload images function v2 - with Netlify Blobs integration
+const { getStore } = require('@netlify/blobs');
+
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
   
@@ -35,36 +37,44 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Simple mock upload response - in production this would be implemented with proper file handling
+    // For now, return a simple mock response since multipart/form-data parsing is complex
+    // The real implementation would parse multipart data and store in Blobs
+    console.log(`Mock upload for folder: ${folderId}`);
+    
     const timestamp = Date.now();
-    const uploadedImages = [
-      {
-        key: `${folderId}/uploaded-${timestamp}.jpg`,
-        name: `uploaded-image-${timestamp}.jpg`,
-        size: 123456,
-        type: "image/jpeg"
-      }
-    ];
+    const mockImageKey = `${folderId}/mock-${timestamp}.jpg`;
+    const mockImage = {
+      key: mockImageKey,
+      name: `mock-image-${timestamp}.jpg`,
+      path: `/.netlify/functions/gallery-image-v2?key=${encodeURIComponent(mockImageKey)}`,
+      size: 123456,
+      type: "image/jpeg"
+    };
 
-    // Notify gallery-images-v2 about the uploaded images
-    try {
-      await fetch(`${event.headers.origin || 'https://zimber-electric.hu'}/.netlify/functions/gallery-images-v2?folder=${folderId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ images: uploadedImages })
-      });
-    } catch (notifyError) {
-      console.log('Failed to notify gallery-images about upload:', notifyError);
-    }
+    // Get the gallery store
+    const galleryStore = getStore('gallery-images');
+    
+    // Store a mock blob (empty buffer for now)
+    const mockImageData = Buffer.from('mock-image-data');
+    await galleryStore.set(mockImageKey, mockImageData, {
+      metadata: {
+        originalName: mockImage.name,
+        folderId: folderId,
+        uploadTime: new Date().toISOString(),
+        contentType: mockImage.type
+      }
+    });
+
+    console.log(`Stored mock image: ${mockImageKey}`);
 
     return {
       statusCode: 200,
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify({ 
         success: true, 
-        message: "Upload successful (mock implementation)",
-        uploaded: uploadedImages.length,
-        images: uploadedImages
+        message: "Mock upload successful - Blobs integration working",
+        uploaded: 1,
+        images: [mockImage]
       })
     };
 

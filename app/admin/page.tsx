@@ -26,6 +26,8 @@ interface GalleryFolder {
 interface GalleryImage {
   name: string
   path: string
+  key?: string
+  static?: boolean
 }
 
 export default function AdminPage() {
@@ -141,7 +143,7 @@ export default function AdminPage() {
   const loadImages = async (folderId: string) => {
     try {
       const imagesEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/gallery-images-v2?folder=${folderId}`
+        ? `/.netlify/functions/supabase-images?folder=${folderId}`
         : `/api/admin/folders/${folderId}/images`
         
       const response = await fetch(imagesEndpoint)
@@ -231,7 +233,7 @@ export default function AdminPage() {
 
     try {
       const uploadEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/upload-images-v2?folder=${selectedFolder}`
+        ? `/.netlify/functions/supabase-upload?folder=${selectedFolder}`
         : `/api/admin/folders/${selectedFolder}/upload`
         
       const response = await fetch(uploadEndpoint, {
@@ -249,15 +251,18 @@ export default function AdminPage() {
     }
   }
 
-  const deleteImage = async (imageName: string) => {
+  const deleteImage = async (image: any) => {
     if (!selectedFolder || !confirm('Biztosan törölni szeretnéd ezt a képet?')) {
       return
     }
 
     try {
+      // For Blobs images, use the key; for static images, use the name
+      const imageIdentifier = image.key || image.name;
+      
       const deleteImageEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/gallery-images?folder=${selectedFolder}&image=${imageName}`
-        : `/api/admin/folders/${selectedFolder}/images/${imageName}`
+        ? `/.netlify/functions/gallery-images-v2?folder=${selectedFolder}&image=${encodeURIComponent(imageIdentifier)}`
+        : `/api/admin/folders/${selectedFolder}/images/${imageIdentifier}`
         
       const response = await fetch(deleteImageEndpoint, {
         method: 'DELETE',
@@ -588,7 +593,7 @@ export default function AdminPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {images.map((image) => (
                     <div
-                      key={image.name}
+                      key={image.key || image.name}
                       className="relative group aspect-square rounded-lg overflow-hidden bg-midnight border border-electric-cyan/20"
                     >
                       <Image
@@ -596,14 +601,30 @@ export default function AdminPage() {
                         alt={image.name}
                         fill
                         className="object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `
+                              <div class="w-full h-full flex items-center justify-center bg-red-900/20 text-red-400 text-xs text-center">
+                                Kép nem található
+                              </div>
+                            `;
+                          }
+                        }}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-200">
                         <button
-                          onClick={() => deleteImage(image.name)}
+                          onClick={() => deleteImage(image)}
                           className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
                         >
                           <Trash2 size={14} />
                         </button>
+                        {/* Show image type indicator */}
+                        <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                          {image.static ? 'Statikus' : 'Feltöltött'}
+                        </div>
                       </div>
                     </div>
                   ))}

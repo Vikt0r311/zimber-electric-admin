@@ -40,19 +40,45 @@ export default function GalleryPage() {
     try {
       setLoading(true)
       
-      // In production (Netlify), use Netlify Functions directly
-      // In development, use Next.js API routes
-      const apiEndpoint = process.env.NODE_ENV === 'production' 
-        ? '/.netlify/functions/public-gallery-v2'
+      // Get folders directly from gallery-folders-v2 for real-time updates
+      const foldersEndpoint = process.env.NODE_ENV === 'production' 
+        ? '/.netlify/functions/gallery-folders-v2'
         : '/api/gallery/folders'
         
-      const response = await fetch(apiEndpoint)
-      const data = await response.json()
+      const foldersResponse = await fetch(foldersEndpoint)
+      const folders = await foldersResponse.json()
+      
+      // Load images for each folder
+      const categoriesWithImages = await Promise.all(folders.map(async (folder: any) => {
+        try {
+          const imagesEndpoint = process.env.NODE_ENV === 'production'
+            ? `/.netlify/functions/supabase-images?folder=${folder.id}`
+            : `/api/gallery/folders/${folder.id}/images`
+          
+          const imagesResponse = await fetch(imagesEndpoint)
+          const images = await imagesResponse.json()
+          
+          return {
+            ...folder,
+            images: images.map((img: any) => ({
+              name: img.name,
+              src: img.path || img.src,
+              alt: `${folder.name} - ${img.name}`
+            }))
+          }
+        } catch (error) {
+          console.error(`Error loading images for folder ${folder.id}:`, error)
+          return {
+            ...folder,
+            images: []
+          }
+        }
+      }))
       
       // Add "All" category at the beginning
       const allCategories = [
         { id: 'all', name: 'Összes', folder: '', imageCount: 0, images: [] },
-        ...data
+        ...categoriesWithImages
       ]
       
       setCategories(allCategories)
@@ -128,7 +154,7 @@ export default function GalleryPage() {
               Referencia Munkák
             </h1>
             <p className="text-white/70 text-lg">
-              Elvégzett projektjeink galériája
+              Elvégzett projektjeink galériája 
             </p>
           </motion.div>
 
