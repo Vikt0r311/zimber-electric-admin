@@ -43,7 +43,7 @@ export default function GalleryPage() {
       // In production (Netlify), use Netlify Functions directly
       // In development, use Next.js API routes
       const apiEndpoint = process.env.NODE_ENV === 'production' 
-        ? '/.netlify/functions/public-gallery-real'
+        ? '/.netlify/functions/public-gallery-simple'
         : '/api/gallery/folders'
         
       const response = await fetch(apiEndpoint)

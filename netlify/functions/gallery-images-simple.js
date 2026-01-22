@@ -31,12 +31,16 @@ exports.handler = async (event, context) => {
         };
       }
 
-      // Generate some mock images for demo with working URLs
-      const imageCount = Math.floor(Math.random() * 3) + 1; // 1-3 images
-      const folderImages = Array.from({length: imageCount}, (_, i) => ({
-        name: `mock-image-${i + 1}.jpg`,
-        path: `https://picsum.photos/400/300?random=${folderId}-${i + 1}`
-      }));
+      // Generate static images for real folders
+      const staticImageMaps = {
+        'tata-140m2-csaladi-haz': generateImageList('tata-140m2-csaladi-haz', 59),
+        'komarom-64m2-panellakas': generateImageList('komarom-64m2-panellakas', 16),
+        'almasfuzito-55m2-panellakas': generateImageList('almasfuzito_55m2_panellakas', 26),
+        'kiseloszto-csere': generateImageList('kiseloszto-csere', 2),
+        'homlokzati-hoszigeteleshez-szerelvenyek': generateImageList('homlokzati-hoszigeteleshez-szerelvenyek', 6)
+      };
+
+      const folderImages = staticImageMaps[folderId] || [];
 
       return {
         statusCode: 200,
@@ -69,3 +73,15 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+function generateImageList(folderName, count) {
+  const images = [];
+  for (let i = 1; i <= count; i++) {
+    const paddedNum = String(i).padStart(2, '0');
+    images.push({
+      name: `Image${paddedNum}.webp`,
+      path: `/galeria/${folderName}/Image${paddedNum}.webp`
+    });
+  }
+  return images;
+}

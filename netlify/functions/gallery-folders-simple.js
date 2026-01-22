@@ -1,5 +1,36 @@
-// Simple test function for troubleshooting
-let mockFolders = []; // In-memory storage for testing
+// Simple test function with static folders
+let mockFolders = [
+  {
+    id: "tata-140m2-csaladi-haz",
+    name: "Tata - 140m² Családi Ház", 
+    folder: "tata-140m2-csaladi-haz",
+    imageCount: 59
+  },
+  {
+    id: "komarom-64m2-panellakas",
+    name: "Komárom - 64m² Panellakás",
+    folder: "komarom-64m2-panellakas", 
+    imageCount: 16
+  },
+  {
+    id: "almasfuzito-55m2-panellakas",
+    name: "Almásfüzitő - 55m² Panellakás",
+    folder: "almasfuzito_55m2_panellakas",
+    imageCount: 26
+  },
+  {
+    id: "kiseloszto-csere",
+    name: "Kiselosztó Csere",
+    folder: "kiseloszto-csere",
+    imageCount: 2
+  },
+  {
+    id: "homlokzati-hoszigeteleshez-szerelvenyek",
+    name: "Homlokzati Hőszigetelés Szerelvények", 
+    folder: "homlokzati-hoszigeteleshez-szerelvenyek",
+    imageCount: 6
+  }
+]; // Static folders with real data
 
 exports.handler = async (event, context) => {
   const method = event.httpMethod;

@@ -18,55 +18,49 @@ exports.handler = async (event, context) => {
 
   try {
     if (method === "GET") {
-      // Return mock gallery folders with images for demo
-      const mockGalleries = [
+      // Return real gallery folders with static images
+      const realGalleries = [
         {
-          id: "tata-projekt",
-          name: "Tata - 140m² Családi Ház Villanyszerelés",
-          folder: "tata-projekt", 
-          imageCount: 3,
-          images: [
-            {
-              name: "elektromos-panel.jpg",
-              src: "https://picsum.photos/400/300?random=1",
-              alt: "Tata projekt - Elektromos panel telepítés"
-            },
-            {
-              name: "led-vilagitas.jpg", 
-              src: "https://picsum.photos/400/300?random=2",
-              alt: "Tata projekt - Modern LED világítási rendszer"
-            },
-            {
-              name: "kapcsolo-rendszer.jpg",
-              src: "https://picsum.photos/400/300?random=3", 
-              alt: "Tata projekt - Okos kapcsoló rendszer"
-            }
-          ]
+          id: "tata-140m2-csaladi-haz",
+          name: "Tata - 140m² Családi Ház", 
+          folder: "tata-140m2-csaladi-haz",
+          imageCount: 59,
+          images: generateStaticImages("tata-140m2-csaladi-haz", 10) // Show first 10
         },
         {
-          id: "komarom-uzlet", 
-          name: "Komárom - Üzlethelyiség Korszerűsítés",
-          folder: "komarom-uzlet",
+          id: "komarom-64m2-panellakas",
+          name: "Komárom - 64m² Panellakás",
+          folder: "komarom-64m2-panellakas", 
+          imageCount: 16,
+          images: generateStaticImages("komarom-64m2-panellakas", 10)
+        },
+        {
+          id: "almasfuzito-55m2-panellakas",
+          name: "Almásfüzitő - 55m² Panellakás",
+          folder: "almasfuzito_55m2_panellakas",
+          imageCount: 26,
+          images: generateStaticImages("almasfuzito_55m2_panellakas", 10)
+        },
+        {
+          id: "kiseloszto-csere",
+          name: "Kiselosztó Csere",
+          folder: "kiseloszto-csere",
           imageCount: 2,
-          images: [
-            {
-              name: "uzlet-vilagitas.jpg",
-              src: "https://picsum.photos/400/300?random=4",
-              alt: "Komárom projekt - Üzlethelyiség világítás"
-            },
-            {
-              name: "biztonsagi-rendszer.jpg", 
-              src: "https://picsum.photos/400/300?random=5",
-              alt: "Komárom projekt - Biztonsági kamera rendszer"
-            }
-          ]
+          images: generateStaticImages("kiseloszto-csere", 2)
+        },
+        {
+          id: "homlokzati-hoszigeteleshez-szerelvenyek",
+          name: "Homlokzati Hőszigetelés Szerelvények", 
+          folder: "homlokzati-hoszigeteleshez-szerelvenyek",
+          imageCount: 6,
+          images: generateStaticImages("homlokzati-hoszigeteleshez-szerelvenyek", 6)
         }
       ];
 
       return {
         statusCode: 200,
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify(mockGalleries)
+        body: JSON.stringify(realGalleries)
       };
     }
 
@@ -85,3 +79,16 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+function generateStaticImages(folderName, count) {
+  const images = [];
+  for (let i = 1; i <= count; i++) {
+    const paddedNum = String(i).padStart(2, '0');
+    images.push({
+      name: `Image${paddedNum}.webp`,
+      src: `/galeria/${folderName}/Image${paddedNum}.webp`,
+      alt: `${folderName} - Image${paddedNum}.webp`
+    });
+  }
+  return images;
+}
