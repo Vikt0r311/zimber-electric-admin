@@ -1,6 +1,4 @@
-// Simple gallery images function for troubleshooting
-let mockImages = {}; // Store mock images per folder
-
+// Gallery images function v2 - serves real static images
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
   
@@ -20,7 +18,6 @@ exports.handler = async (event, context) => {
 
   try {
     if (method === "GET") {
-      // Parse folder ID from query params - use event.queryStringParameters
       const folderId = event.queryStringParameters?.folder;
       
       if (!folderId) {
@@ -65,7 +62,7 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error("Simple gallery images error:", error);
+    console.error("Gallery images error:", error);
     return {
       statusCode: 500,
       headers: { ...headers, "Content-Type": "application/json" },

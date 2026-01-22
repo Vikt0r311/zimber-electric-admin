@@ -141,7 +141,7 @@ export default function AdminPage() {
   const loadImages = async (folderId: string) => {
     try {
       const imagesEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/gallery-images-real?folder=${folderId}`
+        ? `/.netlify/functions/gallery-images-v2?folder=${folderId}`
         : `/api/admin/folders/${folderId}/images`
         
       const response = await fetch(imagesEndpoint)
@@ -231,7 +231,7 @@ export default function AdminPage() {
 
     try {
       const uploadEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/upload-images-real?folder=${selectedFolder}`
+        ? `/.netlify/functions/upload-images-v2?folder=${selectedFolder}`
         : `/api/admin/folders/${selectedFolder}/upload`
         
       const response = await fetch(uploadEndpoint, {

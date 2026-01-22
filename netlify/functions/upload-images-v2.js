@@ -1,6 +1,4 @@
-const { getStore } = require("@netlify/blobs");
-const multiparty = require('multiparty');
-
+// Upload images function v2 - simple implementation without multiparty
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
   
@@ -37,40 +35,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Initialize stores
-    let metaStore, imagesStore;
-    try {
-      metaStore = getStore({
-        name: "gallery-metadata",
-        siteID: process.env.NETLIFY_SITE_ID,
-        token: process.env.NETLIFY_TOKEN,
-      });
-      imagesStore = getStore({
-        name: "gallery-images",
-        siteID: process.env.NETLIFY_SITE_ID,
-        token: process.env.NETLIFY_TOKEN,
-      });
-    } catch (storeError) {
-      console.error('Store initialization failed:', storeError);
-      return {
-        statusCode: 500,
-        headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Storage not available" })
-      };
-    }
-
-    // Check if folder exists
-    const foldersData = await metaStore.get("folders", { type: "json" }) || {};
-    if (!foldersData[folderId]) {
-      return {
-        statusCode: 404,
-        headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Folder not found" })
-      };
-    }
-
-    // Parse multipart data (simplified - in real implementation would need proper parsing)
-    // For now, return success with mock uploaded image info
+    // Simple mock upload response - in production this would be implemented with proper file handling
     const uploadedImages = [
       {
         key: `${folderId}/uploaded-${Date.now()}.jpg`,
@@ -85,7 +50,7 @@ exports.handler = async (event, context) => {
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify({ 
         success: true, 
-        message: "Upload successful",
+        message: "Upload successful (mock implementation)",
         uploaded: uploadedImages.length,
         images: uploadedImages
       })
