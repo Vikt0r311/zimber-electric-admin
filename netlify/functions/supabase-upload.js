@@ -39,10 +39,13 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Parse the base64 encoded body
+    console.log(`Upload request for folder: ${folderId}`);
+    console.log(`Content-Type: ${event.headers['content-type']}`);
+    console.log(`Body length: ${event.body ? event.body.length : 0}`);
+    console.log(`Is Base64: ${event.isBase64Encoded}`);
+
+    // Get the raw body
     const body = event.body;
-    const isBase64 = event.isBase64Encoded;
-    
     if (!body) {
       return {
         statusCode: 400,
@@ -51,102 +54,82 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // For multipart form data from browser, parse as binary
-    let boundary = '';
-    const contentType = event.headers['content-type'] || event.headers['Content-Type'] || '';
-    const boundaryMatch = contentType.match(/boundary=([^;]+)/);
-    if (boundaryMatch) {
-      boundary = boundaryMatch[1];
-    }
-
+    // Convert body to buffer
     let bodyBuffer;
-    if (isBase64) {
+    if (event.isBase64Encoded) {
       bodyBuffer = Buffer.from(body, 'base64');
     } else {
       bodyBuffer = Buffer.from(body, 'utf8');
     }
 
-    // Simple multipart parsing
-    const bodyString = bodyBuffer.toString();
-    const parts = bodyString.split(`--${boundary}`);
+    console.log(`Buffer length: ${bodyBuffer.length}`);
+
+    // Simple approach: create a test file first to verify connection
+    const timestamp = Date.now();
+    const testFileName = `test-${timestamp}.txt`;
+    const testFilePath = `gallery/${folderId}/${testFileName}`;
     
-    const uploadedImages = [];
-    
-    for (const part of parts) {
-      if (part.includes('filename=')) {
-        // Extract filename
-        const filenameMatch = part.match(/filename="([^"]+)"/);
-        if (!filenameMatch) continue;
-        
-        const originalFilename = filenameMatch[1];
-        const timestamp = Date.now();
-        const fileExtension = originalFilename.split('.').pop();
-        const fileName = `uploaded-${timestamp}.${fileExtension}`;
-        
-        // Extract file content (everything after double CRLF)
-        const contentStart = part.indexOf('\r\n\r\n');
-        if (contentStart === -1) continue;
-        
-        const fileContent = part.substring(contentStart + 4);
-        // Remove the trailing boundary
-        const cleanContent = fileContent.replace(/\r\n$/, '');
-        
-        const filePath = `gallery/${folderId}/${fileName}`;
-        
-        // Determine content type
-        let contentTypeToUse = 'image/jpeg';
-        if (originalFilename.toLowerCase().endsWith('.png')) {
-          contentTypeToUse = 'image/png';
-        } else if (originalFilename.toLowerCase().endsWith('.webp')) {
-          contentTypeToUse = 'image/webp';
-        } else if (originalFilename.toLowerCase().endsWith('.gif')) {
-          contentTypeToUse = 'image/gif';
-        }
-        
-        const { data, error } = await supabase.storage
-          .from('images')
-          .upload(filePath, Buffer.from(cleanContent, 'binary'), {
-            contentType: contentTypeToUse,
-            upsert: true
-          });
+    const { data: testData, error: testError } = await supabase.storage
+      .from('images')
+      .upload(testFilePath, 'Connection test successful', {
+        contentType: 'text/plain',
+        upsert: true
+      });
 
-        if (error) {
-          console.error('Supabase upload error:', error);
-          continue;
-        }
-
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('images')
-          .getPublicUrl(filePath);
-
-        uploadedImages.push({
-          name: fileName,
-          path: publicUrl,
-          key: filePath,
-          size: cleanContent.length,
-          type: contentTypeToUse
-        });
-
-        console.log(`Successfully uploaded: ${filePath}`);
-      }
-    }
-
-    if (uploadedImages.length === 0) {
+    if (testError) {
+      console.error('Supabase connection test failed:', testError);
       return {
-        statusCode: 400,
+        statusCode: 500,
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "No valid images found in upload" })
+        body: JSON.stringify({ error: `Supabase connection failed: ${testError.message}` })
       };
     }
+
+    console.log('Supabase connection test successful');
+
+    // Now try to upload the actual image
+    const imageFileName = `image-${timestamp}.jpg`;
+    const imageFilePath = `gallery/${folderId}/${imageFileName}`;
+    
+    const { data, error } = await supabase.storage
+      .from('images')
+      .upload(imageFilePath, bodyBuffer, {
+        contentType: 'image/jpeg',
+        upsert: true
+      });
+
+    if (error) {
+      console.error('Image upload error:', error);
+      return {
+        statusCode: 500,
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ error: `Image upload failed: ${error.message}` })
+      };
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('images')
+      .getPublicUrl(imageFilePath);
+
+    console.log(`Successfully uploaded: ${imageFilePath} -> ${publicUrl}`);
+
+    // Clean up test file
+    await supabase.storage.from('images').remove([testFilePath]);
 
     return {
       statusCode: 200,
       headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify({
         success: true,
-        message: `Successfully uploaded ${uploadedImages.length} image(s) to Supabase Storage!`,
-        images: uploadedImages
+        message: "Upload successful to Supabase Storage!",
+        images: [{
+          name: imageFileName,
+          path: publicUrl,
+          key: imageFilePath,
+          size: bodyBuffer.length,
+          type: "image/jpeg"
+        }]
       })
     };
 
