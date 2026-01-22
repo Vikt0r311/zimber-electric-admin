@@ -28,17 +28,17 @@ exports.handler = async (event, context) => {
           images: [
             {
               name: "elektromos-panel.jpg",
-              src: "https://via.placeholder.com/400x300/1a1d29/00d9ff?text=Elektromos+Panel",
+              src: "https://picsum.photos/400/300?random=1",
               alt: "Tata projekt - Elektromos panel telepítés"
             },
             {
               name: "led-vilagitas.jpg", 
-              src: "https://via.placeholder.com/400x300/1a1d29/ffc107?text=LED+Világítás",
+              src: "https://picsum.photos/400/300?random=2",
               alt: "Tata projekt - Modern LED világítási rendszer"
             },
             {
               name: "kapcsolo-rendszer.jpg",
-              src: "https://via.placeholder.com/400x300/1a1d29/00d9ff?text=Kapcsoló+Rendszer", 
+              src: "https://picsum.photos/400/300?random=3", 
               alt: "Tata projekt - Okos kapcsoló rendszer"
             }
           ]
@@ -51,12 +51,12 @@ exports.handler = async (event, context) => {
           images: [
             {
               name: "uzlet-vilagitas.jpg",
-              src: "https://via.placeholder.com/400x300/2d3748/00d9ff?text=Üzlet+Világítás",
+              src: "https://picsum.photos/400/300?random=4",
               alt: "Komárom projekt - Üzlethelyiség világítás"
             },
             {
               name: "biztonsagi-rendszer.jpg", 
-              src: "https://via.placeholder.com/400x300/2d3748/ffc107?text=Biztonsági+Rendszer",
+              src: "https://picsum.photos/400/300?random=5",
               alt: "Komárom projekt - Biztonsági kamera rendszer"
             }
           ]

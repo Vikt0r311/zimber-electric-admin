@@ -31,11 +31,11 @@ exports.handler = async (event, context) => {
         };
       }
 
-      // Generate some mock images for demo
+      // Generate some mock images for demo with working URLs
       const imageCount = Math.floor(Math.random() * 3) + 1; // 1-3 images
       const folderImages = Array.from({length: imageCount}, (_, i) => ({
         name: `mock-image-${i + 1}.jpg`,
-        path: `https://via.placeholder.com/400x300/1a1d29/00d9ff?text=Mock+Image+${i + 1}`
+        path: `https://picsum.photos/400/300?random=${folderId}-${i + 1}`
       }));
 
       return {
