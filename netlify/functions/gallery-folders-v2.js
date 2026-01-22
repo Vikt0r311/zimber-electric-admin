@@ -51,11 +51,56 @@ exports.handler = async (event, context) => {
 
   try {
     if (method === "GET") {
-      // Return mock folders
+      // Update image counts from Supabase Storage
+      const foldersWithCounts = await Promise.all(mockFolders.map(async (folder) => {
+        try {
+          const { createClient } = require('@supabase/supabase-js');
+          
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          
+          let dynamicImageCount = folder.imageCount; // Default to static count
+          
+          if (supabaseUrl && supabaseServiceKey) {
+            const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+              auth: {
+                autoRefreshToken: false,
+                persistSession: false
+              }
+            });
+
+            // Get uploaded images count from Supabase
+            const { data: images, error } = await supabase.storage
+              .from('images')
+              .list(`gallery/${folder.id}`);
+
+            if (!error && images) {
+              const uploadedCount = images.filter(img => img.name !== '.emptyFolderPlaceholder').length;
+              
+              // For static folders, add uploaded count to existing static count
+              if (folder.imageCount > 0) {
+                dynamicImageCount = folder.imageCount + uploadedCount;
+              } else {
+                // For dynamic folders (created by user), use only uploaded count
+                dynamicImageCount = uploadedCount;
+              }
+            }
+          }
+
+          return {
+            ...folder,
+            imageCount: dynamicImageCount
+          };
+        } catch (error) {
+          console.error(`Error counting images for folder ${folder.id}:`, error);
+          return folder;
+        }
+      }));
+
       return {
         statusCode: 200,
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify(mockFolders)
+        body: JSON.stringify(foldersWithCounts)
       };
     }
 

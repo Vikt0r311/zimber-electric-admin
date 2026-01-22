@@ -176,7 +176,7 @@ export default function GalleryPage() {
                         : 'bg-graphite text-white hover:bg-graphite/80 border border-electric-cyan/20 hover:border-electric-cyan/50'
                     }`}
                   >
-                    {category.name} {category.id !== 'all' && `(${category.imageCount})`}
+                    {category.name} {category.id !== 'all' && category.imageCount > 0 && `(${category.imageCount})`}
                   </button>
                 ))}
               </div>
