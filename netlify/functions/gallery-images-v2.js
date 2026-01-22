@@ -1,4 +1,6 @@
 // Gallery images function v2 - serves real static images
+let uploadedImages = {}; // Store uploaded images per folder
+
 exports.handler = async (event, context) => {
   const method = event.httpMethod;
   
@@ -37,12 +39,46 @@ exports.handler = async (event, context) => {
         'homlokzati-hoszigeteleshez-szerelvenyek': generateImageList('homlokzati-hoszigeteleshez-szerelvenyek', 6)
       };
 
-      const folderImages = staticImageMaps[folderId] || [];
+      const staticImages = staticImageMaps[folderId] || [];
+      const dynamicImages = uploadedImages[folderId] || [];
+      const allImages = [...staticImages, ...dynamicImages];
 
       return {
         statusCode: 200,
         headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify(folderImages)
+        body: JSON.stringify(allImages)
+      };
+    }
+
+    if (method === "POST") {
+      // Add uploaded image to folder
+      const folderId = event.queryStringParameters?.folder;
+      const requestBody = JSON.parse(event.body || '{}');
+      
+      if (!folderId) {
+        return {
+          statusCode: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ error: "Folder ID is required" })
+        };
+      }
+
+      if (!uploadedImages[folderId]) {
+        uploadedImages[folderId] = [];
+      }
+
+      // Add the uploaded image
+      if (requestBody.images && Array.isArray(requestBody.images)) {
+        uploadedImages[folderId].push(...requestBody.images.map(img => ({
+          name: img.name,
+          path: `/uploads/${folderId}/${img.name}`
+        })));
+      }
+
+      return {
+        statusCode: 200,
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ success: true, message: "Images added to folder" })
       };
     }
 

@@ -36,14 +36,26 @@ exports.handler = async (event, context) => {
     }
 
     // Simple mock upload response - in production this would be implemented with proper file handling
+    const timestamp = Date.now();
     const uploadedImages = [
       {
-        key: `${folderId}/uploaded-${Date.now()}.jpg`,
-        name: `uploaded-image-${Date.now()}.jpg`,
+        key: `${folderId}/uploaded-${timestamp}.jpg`,
+        name: `uploaded-image-${timestamp}.jpg`,
         size: 123456,
         type: "image/jpeg"
       }
     ];
+
+    // Notify gallery-images-v2 about the uploaded images
+    try {
+      await fetch(`${event.headers.origin || 'https://zimber-electric.hu'}/.netlify/functions/gallery-images-v2?folder=${folderId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images: uploadedImages })
+      });
+    } catch (notifyError) {
+      console.log('Failed to notify gallery-images about upload:', notifyError);
+    }
 
     return {
       statusCode: 200,
