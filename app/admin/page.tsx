@@ -119,7 +119,7 @@ export default function AdminPage() {
   const loadFolders = async () => {
     try {
       const foldersEndpoint = process.env.NODE_ENV === 'production' 
-        ? '/.netlify/functions/gallery-folders-simple'
+        ? '/.netlify/functions/gallery-folders-v2'
         : '/api/admin/folders'
         
       const response = await fetch(foldersEndpoint)
