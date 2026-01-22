@@ -16,11 +16,13 @@ export default function ContactPage() {
     const form = e.currentTarget
     const formData = new FormData(form)
 
+    // Add form-name for Netlify Forms
+    formData.append('form-name', 'kapcsolat')
+
     try {
       const response = await fetch('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData as any).toString(),
+        body: formData,
       })
 
       if (response.ok) {
@@ -155,14 +157,14 @@ export default function ContactPage() {
                         className="w-full bg-graphite border border-electric-cyan/30 text-white px-4 py-3 rounded-lg focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/50 focus:outline-none transition"
                       >
                         <option value="">Válassz...</option>
-                        <option>Teljes villamos hálózat kiépítés</option>
-                        <option>Hálózat korszerűsítés / javítás</option>
-                        <option>Elosztó / biztosítéktábla csere</option>
-                        <option>LED világítás / szalag beépítés</option>
-                        <option>Elektromos Berendezések Bekötése(tűzhely,főzőlap, bojler, stb)</option>
-                        <option>Kisebb javítás (lámpa, kapcsoló, dugalj)</option>
-                        <option>Vészhelyzet / azonnali javítás</option>
-                        <option>Egyéb</option>
+                        <option value="Teljes villamos hálózat kiépítés">Teljes villamos hálózat kiépítés</option>
+                        <option value="Hálózat korszerűsítés / javítás">Hálózat korszerűsítés / javítás</option>
+                        <option value="Elosztó / biztosítéktábla csere">Elosztó / biztosítéktábla csere</option>
+                        <option value="LED világítás / szalag beépítés">LED világítás / szalag beépítés</option>
+                        <option value="Elektromos Berendezések Bekötése(tűzhely,főzőlap, bojler, stb)">Elektromos Berendezések Bekötése(tűzhely,főzőlap, bojler, stb)</option>
+                        <option value="Kisebb javítás (lámpa, kapcsoló, dugalj)">Kisebb javítás (lámpa, kapcsoló, dugalj)</option>
+                        <option value="Vészhelyzet / azonnali javítás">Vészhelyzet / azonnali javítás</option>
+                        <option value="Egyéb">Egyéb</option>
                       </select>
                     </div>
 
