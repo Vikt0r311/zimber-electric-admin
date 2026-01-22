@@ -261,7 +261,7 @@ export default function AdminPage() {
       const imageIdentifier = image.key || image.name;
       
       const deleteImageEndpoint = process.env.NODE_ENV === 'production' 
-        ? `/.netlify/functions/gallery-images-v2?folder=${selectedFolder}&image=${encodeURIComponent(imageIdentifier)}`
+        ? `/.netlify/functions/supabase-delete?folder=${selectedFolder}&image=${encodeURIComponent(imageIdentifier)}`
         : `/api/admin/folders/${selectedFolder}/images/${imageIdentifier}`
         
       const response = await fetch(deleteImageEndpoint, {
