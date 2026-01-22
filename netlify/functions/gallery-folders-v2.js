@@ -133,6 +133,45 @@ exports.handler = async (event, context) => {
       }
 
       const deletedFolder = mockFolders[folderIndex];
+      
+      // Delete images from Supabase Storage first
+      try {
+        const { createClient } = require('@supabase/supabase-js');
+        
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        
+        if (supabaseUrl && supabaseServiceKey) {
+          const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false
+            }
+          });
+
+          // List all images in the folder
+          const { data: images, error: listError } = await supabase.storage
+            .from('images')
+            .list(`gallery/${folderId}`);
+
+          if (!listError && images && images.length > 0) {
+            // Delete all images in the folder
+            const imagePaths = images.map(img => `gallery/${folderId}/${img.name}`);
+            const { error: deleteError } = await supabase.storage
+              .from('images')
+              .remove(imagePaths);
+
+            if (deleteError) {
+              console.error('Error deleting images from Supabase:', deleteError);
+            } else {
+              console.log(`Successfully deleted ${images.length} images from Supabase folder: ${folderId}`);
+            }
+          }
+        }
+      } catch (supabaseError) {
+        console.error('Supabase deletion error:', supabaseError);
+      }
+
       mockFolders.splice(folderIndex, 1);
 
       // Notify public-gallery-v2 about the deleted folder
